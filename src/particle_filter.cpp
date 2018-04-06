@@ -97,11 +97,27 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	
 	for(j=0; j<particles.size();j++) {
 		vector<LandmarkObs> obs_landmarks;
+		vector<int> associations;
 		for(int i=0;i<observations.size();i++) {
 			LandmarkObs l;
 			l.x = particles[j].x + (observations[i].x * cos(particles[j].theta) - sin(particles[j].theta) * observations[i].y);
 			l.y = particles[j].y + (observations[i].x * sin(particles[j].theta) + cos(particles[j].theta) * observations[i].y);
 			obs_landmarks.push_back(l);
+		}
+		particles[j].weight = 1;
+		for(int i =0;i<obs_landmarks.size();i++) {
+			double shortest_dist=-100;
+			int id = -1;
+			for(int k=0;k<map_landmarks.landmark_list.size();i++) {
+				double dist = sqrt( pow((obs_landmarks[i].x - map_landmarks.landmark_list[k].x_f),2) - pow((obs_landmarks[i].y - map_landmarks.landmark_list[k].y_f),2) );
+				if(dist<shortest_dist) {
+					shortest_dist = dist; 
+					id = map_landmarks.landmark_list[k].id_i; 
+				}
+			}
+			SetAssociations(particles[j], pa)
+			double multi_dist = (1/(2*M_PI*std_landmark[0]*std_landmark[1])) * math.exp(-1*( (pow((obs_landmarks[i].x - x),2)/(2*std_landmark[0])) + (pow((obs_landmarks[i].y - y),2)/(2*std_landmark[1])) ));
+			particles[j].weight*=multi_dist;
 		}
 	}
 }
